@@ -1,0 +1,75 @@
+* qwen-chat-shell
+
+[[https://github.com/QwenLM/Qwen][Qwen]] chat shell in Emacs with [[https://orgmode.org/worg/org-contrib/babel/intro.html][Org Babel]], inspired by [[https://github.com/xenodium/chatgpt-shell][chatgpt-shell]]. Qwen is the large-scale language model developed by Alibaba Cloud. You can find more information in this [[https://qwenlm.github.io/][blog]]. Using Qwen is more convenient and cost-effective in China and it should behave better in the Chinese context.
+
+** Usage
+
+*** Installation
+
+Install with MELPA =M-x package-install= =qwen-chat-shell=.
+
+If using [[https://github.com/jwiegley/use-package][use-package]],
+
+#+begin_src emacs-lisp
+  (use-package qwen-chat-shell
+    :ensure t)
+#+end_src
+
+*** Configure Dashscope Key
+
+Visit [[https://help.aliyun.com/zh/dashscope/developer-reference/activate-dashscope-and-create-an-api-key][Dashscope]] and follow the instructions to create your API-key. The key could be something like =sk-abcdefghijkl1234567890=. You can configure the key by adding configuration directly:
+#+begin_src emacs-lisp
+  (use-package qwen-chat-shell
+    :ensure t
+    :custom
+    (qwen-chat-shell-dashscope-key . "sk-abcdefghijkl1234567890"))
+#+end_src
+
+*** Launch the shell
+
+Type =M-x qwen-chat-shell=.
+
+Input =help= to get all the available commands and their shortcuts. For example, choose the model with =M-x qwen-chat-shell-switch-model-version=. Change the prompt with =M-x qwen-chat-shell-switch-system-prompt=.
+
+*** Org babel integration
+Code block answered by the LLM could be  
+
+*** Customization
+
+The available models are stored in variable =qwen-chat-shell-available-models=, default to 
+  #+begin_src emacs-lisp
+    ("qwen1.5-0.5b-chat"
+     "qwen1.5-1.8b-chat"
+     "qwen1.5-7b-chat"
+     "qwen1.5-14b-chat"
+     "qwen1.5-32b-chat"
+     "qwen1.5-72b-chat"
+     "qwen1.5-110b-chat"
+     "qwen-1.8b-chat"
+     "qwen-7b-chat"
+     "qwen-14b-chat"
+     "qwen-72b-chat"
+     "codeqwen1.5-7b-chat"
+     "qwen-turbo"
+     "qwen-plus"
+     "qwen-max"
+     "qwen-max-0428"
+     "qwen-max-longcontext"
+     "qwen-long"
+     "qwen-1.8b-longcontext-chat")
+  #+end_src
+
+Change the default model chosen by =M-x customize-variable= =qwen-chat-shell-current-model=, set the value to the model name above or its index in the list.
+
+You can also configure it by:
+#+begin_src emacs-lisp
+  (use-package qwen-chat-shell
+    :ensure t
+    :config
+    (setq qwen-chat-shell-dashscope-key "sk-3a4e615d4f214d1199ec09e63ec98867")
+    (setq qwen-chat-shell-current-model "qwen1.5-7b-chat"))
+#+end_src
+
+** Future work
+
+- Use qwen-vl-lus to describe image.
