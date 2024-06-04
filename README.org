@@ -66,7 +66,7 @@ You can also configure it by:
   (use-package qwen-chat-shell
     :ensure t
     :config
-    (setq qwen-chat-shell-dashscope-key "sk-3a4e615d4f214d1199ec09e63ec98867")
+    (setq qwen-chat-shell-dashscope-key "sk-abcdefghijkl1234567890")
     (setq qwen-chat-shell-current-model "qwen1.5-7b-chat"))
 #+end_src
 
