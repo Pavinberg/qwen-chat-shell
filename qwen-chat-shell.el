@@ -503,6 +503,7 @@ To create the API-key: https://help.aliyun.com/zh/dashscope/developer-reference/
 ;; Aliasing enables editing as text in babel.
 (defalias 'qwen-chat-shell-mode #'text-mode)
 
+(defvar qwen-chat-shell-mode-map)
 (shell-maker-define-major-mode qwen-chat-shell--config) ; then qwen-chat-shell-mode-map is defined
 
 ;;;###autoload
@@ -1464,7 +1465,7 @@ With prefix REVIEW prompt before sending to LLM."
 (defun qwen-chat-shell--eshell-last-last-command ()
   "Get second to last eshell command."
   (save-excursion
-    (if (string= major-mode "eshell-mode")
+    (if (derived-mode-p 'eshell-mode)
         (let ((cmd-start)
               (cmd-end))
           ;; Find command start and end positions
