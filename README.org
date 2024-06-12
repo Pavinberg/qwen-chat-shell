@@ -38,7 +38,12 @@ Code block answered by the LLM could be
 
 The available models are stored in variable =qwen-chat-shell-available-models=, default to 
   #+begin_src emacs-lisp
-    ("qwen1.5-0.5b-chat"
+    ("qwen2-0.5b-instruct"
+     "qwen2-1.5b-instruct"
+     "qwen2-7b-instruct"
+     "qwen2-72b-instruct"
+     "qwen2-57b-a14b-instruct"
+     "qwen1.5-0.5b-chat"
      "qwen1.5-1.8b-chat"
      "qwen1.5-7b-chat"
      "qwen1.5-14b-chat"
@@ -67,9 +72,27 @@ You can also configure it by:
     :ensure t
     :config
     (setq qwen-chat-shell-dashscope-key "sk-abcdefghijkl1234567890")
-    (setq qwen-chat-shell-current-model "qwen1.5-7b-chat"))
+    (setq qwen-chat-shell-current-model "qwen2-7b-instruct"))
 #+end_src
+
+*** Bultin prompts
+
+=M-x= =customize-variable= =qwen-chat-shell-system-prompts= lists the default system prompts for chat. When chatting, use =C-c C-s= ( =qwen-chat-shell-switch-system-prompt= ) to change the prompt.
+
+There are also some builtin commands to make life easier:
+
+| Command                              | Action                          |
+|--------------------------------------+---------------------------------|
+| qwen-chat-shell-translate-to-english | Translate text to English       |
+| qwen-chat-shell-translate-to-chinese | Translate text to Chinese       |
+| qwen-chat-shell-proofread-region     | Proofread English               |
+| qwen-chat-shell-describe-code        | Describe the meaning of code    |
+| qwen-chat-shell-generate-unit-test   | Generate unit test for the code |
+| qwen-chat-shell-write-git-commit     | Write commit message            |
+| qwen-chat-shell-refactor-code        | Refactor code                   |
+
+For example, to translate English to Chinese, select a region and call the command =M-x= =qwen-chat-shell-translate-to-english= .
 
 ** Future work
 
-- Use qwen-vl-lus to describe image.
+- Use =qwen-vl= to describe image.
