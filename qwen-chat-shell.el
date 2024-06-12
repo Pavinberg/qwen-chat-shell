@@ -4,7 +4,7 @@
 
 ;; Author: Pavinberg <pavin0702@gmail.com>
 ;; URL: https://github.com/Pavinberg/qwen-chat-shell
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Package-Requires: ((emacs "27.1") (shell-maker "0.50.1"))
 
 ;; This package is free software; you can redistribute it and/or modify
@@ -101,6 +101,18 @@
 (defcustom qwen-chat-shell-prompt-header-write-git-commit
   "请帮我为如下 commit 编写一个 git commit 信息："
   "Prompt header of `git-commit`."
+  :type 'string
+  :group 'qwen-chat-shell)
+
+(defcustom qwen-chat-shell-prompt-header-translate-to-english
+  "请帮我把如下内容翻译成英文："
+  "Prompt header of `translate-to-english`."
+  :type 'string
+  :group 'qwen-chat-shell)
+
+(defcustom qwen-chat-shell-prompt-header-translate-to-chinese
+  "请帮我把如下内容翻译成中文："
+  "Prompt header of `translate-to-chinese`."
   :type 'string
   :group 'qwen-chat-shell)
 
@@ -207,7 +219,12 @@ Can be used compile or run source block at point."
   :group 'qwen-chat-shell)
 
 (defcustom qwen-chat-shell-available-models
-  '("qwen1.5-0.5b-chat"
+  '("qwen2-0.5b-instruct"
+    "qwen2-1.5b-instruct"
+    "qwen2-7b-instruct"
+    "qwen2-72b-instruct"
+    "qwen2-57b-a14b-instruct"
+    "qwen1.5-0.5b-chat"
     "qwen1.5-1.8b-chat"
     "qwen1.5-7b-chat"
     "qwen1.5-14b-chat"
@@ -567,9 +584,11 @@ Set NEW-SESSION to start a separate new session."
 (defun qwen-chat-shell--shrink-model-name (model-name)
   "Shrink MODEL-NAME.  For example, qwen-14b-chat -> 14b."
   (string-remove-suffix
-   "-chat"
-   (string-remove-prefix
-    "qwen-" (string-trim model-name))))
+   "-instruct"
+   (string-remove-suffix
+    "-chat"
+    (string-remove-prefix
+     "qwen-" (string-trim model-name)))))
 
 (defun qwen-chat-shell--shrink-system-prompt (prompt)
   "Shrink PROMPT."
@@ -1392,6 +1411,16 @@ enables additional key bindings.
   (interactive)
   (qwen-chat-shell-send-region-with-header qwen-chat-shell-prompt-header-proofread-region))
 
+(defun qwen-chat-shell-translate-to-english ()
+  "Translate the content in the region to English using LLM."
+  (interactive)
+  (qwen-chat-shell-send-region-with-header qwen-chat-shell-prompt-header-translate-to-english))
+
+(defun qwen-chat-shell-translate-to-chinese ()
+  "Translate the content in the region to Chinese using LLM."
+  (interactive)
+  (qwen-chat-shell-send-region-with-header qwen-chat-shell-prompt-header-translate-to-chinese))
+
 (defun qwen-chat-shell-eshell-whats-wrong-with-last-command ()
   "Ask LLM what's wrong with the last eshell command."
   (interactive)
@@ -1887,6 +1916,14 @@ For example:
       (push `(stream . t) request-data))
     request-data))
 
+(defun qwen-chat-shell-get-model-param-num (model)
+  "Get the parameter number from the MODEL name."
+    (let ((param
+           (string-to-number (string-remove-suffix "b" (car (cdr (split-string model "-")))))))
+      (if (/= param 0)
+          param
+        (error "Cannot get paramter number from model name '%s'" model))))
+
 (defun qwen-chat-shell--approximate-context-length (model messages)
   "Approximate the context length using MODEL and MESSAGES.
 Reference:
@@ -1919,9 +1956,15 @@ developer-reference/tongyi-qianwen-7b-14b-72b-api-detailes"
      ((string-equal "qwen-1.8b-longcontext-chat" model)
       (setq tokens-per-message 4
             max-tokens 29800))
-     ((let ((param-num
-             ;; get the parameter number, e.g., qwen-14b-chat -> 14
-             (string-to-number (string-remove-suffix "b" (car (cdr (split-string model "-")))))))
+     ((string-equal "qwen2-57b-a14b-instruct" model)
+      (setq tokens-per-message 4
+            max-tokens 30000))
+     ((string-prefix-p "qwen2-" model)
+      (let ((param-num (qwen-chat-shell-get-model-param-num model)))
+        (if (<= param-num 2)
+            (setq tokens-per-message 4 max-tokens 30000) ; 30720
+          (setq tokens-per-message 4 max-tokens 127800)))) ; 128k
+     ((let ((param-num (qwen-chat-shell-get-model-param-num model)))
         (if (<= param-num 14)
             (setq tokens-per-message 4 max-tokens 5800) ; 6K
           (setq tokens-per-message 4 max-tokens 31800)))) ; 32K
